@@ -4,6 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Activity.API.Data;
+using Activity.API.Models;
+using Activity.API.Dtos;
 using Microsoft.EntityFrameworkCore;
 
 namespace Activity.API.Controllers
@@ -17,7 +19,7 @@ namespace Activity.API.Controllers
             _context = context;
         }
 
-        // GET api/values
+        // GET api/participants
         [HttpGet]
         public async Task<IActionResult> GetParticipants()
         {
@@ -26,10 +28,21 @@ namespace Activity.API.Controllers
             return Ok(values);
         }
 
-        // POST api/values
+        // POST api/participants
         [HttpPost]
-        public void Post([FromBody]string value)
+        public async Task<IActionResult> Post([FromBody]ParticipantDto participantObj)
         {
+            var participantToAdd = new Participant{
+                FirstName = participantObj.FirstName,
+                LastName = participantObj.LastName,
+                Email = participantObj.Email,
+                Activity = participantObj.Activity,
+                Comments = participantObj.Comments
+            };
+            await _context.Participants.AddAsync(participantToAdd);
+            await _context.SaveChangesAsync();
+            // Done
+            return StatusCode(201);
         }
     }
 }
